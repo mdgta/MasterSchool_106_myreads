@@ -1,79 +1,55 @@
 import "./App.css";
-import { useState, useEffect } from "react";
-import {generateBookComponents} from "./helperFunctions";
-import Bookshelf from "./components/Bookshelf";
+import {useState, useEffect} from "react";
 import {get, getAll, update, search} from "./BooksAPI";
+import Book from "./Book";
+import Bookshelf from "./Bookshelf";
 
 function App() {
 	const [showSearchPage, setShowSearchpage] = useState(false);
+	const [books, setBooks] = useState([]);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 
+	/* functionality */
 	function updateBook(book, shelf) {
 		update(book, shelf).then(data => {
-			console.log("updated book:", {
-				originalBookData: book,
-				responseData: data,
-				newShelf: shelf
-			});
-			getAll().then(updatedBookList => {
-				setShelfCurrentlyReading(data.currentlyReading.map(id => updatedBookList.find(book => book.id === id)));
-				setShelfWantToRead(data.wantToRead.map(id => updatedBookList.find(book => book.id === id)));
-				setShelfRead(data.read.map(id => updatedBookList.find(book => book.id === id)));
-			});
-			/*
-			setShelfCurrentlyReading(data.shelfCurrentlyReading);
-			setShelfWantToRead(data.shelfWantToRead);
-			setShelfRead(data.shelfRead);
-			*/
+			console.log("response data for book change:", data);
 		});
 	}
 
-//const {[0]:a, [1]:b} = useState([])
-
-	const [shelfCurrentlyReading, setShelfCurrentlyReading] = useState([]);
-	const [shelfWantToRead, setShelfWantToRead] = useState([]);
-	const [shelfRead, setShelfRead] = useState([]);
-
-	/* add books upon loading */
+	/* load books upon page loading/reload */
 	useEffect(() => {
 		getAll().then(data => {
 			console.log(data);
-			const shelves = {};
-			const shelfUpdates = {
-				currentlyReading: setShelfCurrentlyReading,
-				wantToRead: setShelfWantToRead,
-				read: setShelfRead
-			};
-			data.map(book => {
-				shelves[book.shelf] = shelves[book.shelf] || [];
-				shelves[book.shelf].push(book);
-				setShelfCurrentlyReading(shelfCurrentlyReading.concat(book));
-			});
-			for (const shelf in shelves) {
-				shelfUpdates[shelf](shelves[shelf])
-			}
+			setBooks(data);
 		});
 	}, []);
 
 	/* search functionality */
 	useEffect(() => {
-		// empty search or upon page loading- don't fetch anything and empty list
+		console.log("searching for: " + searchTerm);
+		// ignore upon page loading or when blanking the search bar
 		if (searchTerm === "") {
-			setSearchResults([]);
+			setSearchTerm("");
 			return;
 		}
-		search(searchTerm).then(data => {
-			if (!(data instanceof Array)) {
-				// no results (regular object returned)
-				// clear previous results if there are now 0 results
-				setSearchResults([]);
+		search(searchTerm).then(results => {
+			console.log("search results:", results);
+			if (!(results instanceof Array)) {
+				// no results (regular object returned)- do nothing
 				return;
 			}
-			setSearchResults(data);
+			setSearchResults(results.map(searchResultBook => {
+				// check if a book already exists in user's shelves- if so add the shelf to the search result
+				const existingMatch = books.find(existingBook => existingBook.id === searchResultBook.id);
+				if (existingMatch) {
+					searchResultBook.shelf = existingMatch.shelf;
+				}
+				// return book
+				return searchResultBook;
+			}));
 		});
 	}, [searchTerm]);
-
 
 	return (
 		<div className="app">
@@ -91,14 +67,14 @@ function App() {
 								type="text"
 								placeholder="Search by title, author, or ISBN"
 								value={searchTerm}
-								onChange={(e)=> {setSearchTerm(e.target.value)}}
+								onChange={(e) => {setSearchTerm(e.target.value)}}
 							/>
 						</div>
 					</div>
 					<div className="search-books-results">
 						<ol className="books-grid">
 							{
-								generateBookComponents(searchResults, updateBook)
+								searchResults.map(book => <Book bookData={book} key={book.id} updateBook={updateBook} />)
 							}
 						</ol>
 					</div>
@@ -110,9 +86,9 @@ function App() {
 					</div>
 					<div className="list-books-content">
 						<div>
-							<Bookshelf shelfTitle="Currently Reading" shelfList={shelfCurrentlyReading} updateBook={updateBook} />
-							<Bookshelf shelfTitle="Want to Read" shelfList={shelfWantToRead} updateBook={updateBook} />
-							<Bookshelf shelfTitle="Read" shelfList={shelfRead} updateBook={updateBook} />
+							<Bookshelf sourceList={books} shelfName="currentlyReading" shelfTitle="Currently Reading" updateBook={updateBook} />
+							<Bookshelf sourceList={books} shelfName="wantToRead" shelfTitle="Want to Read" updateBook={updateBook} />
+							<Bookshelf sourceList={books} shelfName="read" shelfTitle="Read" updateBook={updateBook} />
 						</div>
 					</div>
 					<div className="open-search">
