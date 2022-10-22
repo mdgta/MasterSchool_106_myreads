@@ -18,6 +18,4 @@ Using the provided workspace template, and making it functional:
 # Modified files
 (components have the `*.js` suffix as requested in Udacity's gudielines)
 * `src/App.js`- adding functionality and breaking down to components
-* `src/components/Books.js`- React component for a single book
-* `src/components/Bookshelf.js`- React component for a single bookshelf
-* `src/helperFunctions`- separate functions for reducing script size
+* `src/Components.js`- React component for `Bookshelf` and `Book`
