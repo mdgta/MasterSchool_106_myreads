@@ -12,8 +12,23 @@ function App() {
 
 	/* functionality */
 	function updateBook(book, shelf) {
+		console.log(`moving [${book.title}] to [${book.shelf}]: START`, book);
 		update(book, shelf).then(data => {
-			console.log("response data for book change:", data);
+			console.log(`moving [${book.title}] to [${book.shelf}]: DONE`, book);
+			console.log("update data was:", data);
+			const newBooksState = [...books];
+			const existingBookIndex = newBooksState.findIndex(bookInOldList => bookInOldList.id === book.id);
+			console.log({newBooksState: newBooksState.concat(), existingBookIndex});
+			if (existingBookIndex > -1) {
+				// remove if old state
+				newBooksState.splice(existingBookIndex, 1);
+			}
+			if (!(shelf === "none")) {
+				console.log("shelf was NOT none, so adding book to spliced list");
+				newBooksState.push({...book, shelf});
+			}
+			console.log({newBooksState: newBooksState.concat(), existingBookIndex});
+			setBooks(newBooksState);
 		});
 	}
 
