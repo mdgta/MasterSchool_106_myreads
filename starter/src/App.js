@@ -1,8 +1,7 @@
 import "./App.css";
 import {useState, useEffect} from "react";
 import {get, getAll, update, search} from "./BooksAPI";
-import Book from "./Book";
-import Bookshelf from "./Bookshelf";
+import {Book, Bookshelf} from "./Components";
 
 function App() {
 	const [showSearchPage, setShowSearchpage] = useState(false);
@@ -29,6 +28,14 @@ function App() {
 			}
 			console.log({newBooksState: newBooksState.concat(), existingBookIndex});
 			setBooks(newBooksState);
+			// update search results if necessary
+			setSearchResults(searchResults.map(result => {
+				if (result.id === book.id) {
+					result.shelf = shelf;
+				}
+				return result;
+			}));
+
 		});
 	}
 
@@ -46,20 +53,20 @@ function App() {
 		// ignore upon page loading or when blanking the search bar
 		if (searchTerm === "") {
 			setSearchTerm("");
+			setSearchResults([]);
 			return;
 		}
 		search(searchTerm).then(results => {
 			console.log("search results:", results);
 			if (!(results instanceof Array)) {
-				// no results (regular object returned)- do nothing
+				// no results (regular object returned)- empty previous results
+				setSearchResults([]);
 				return;
 			}
 			setSearchResults(results.map(searchResultBook => {
-				// check if a book already exists in user's shelves- if so add the shelf to the search result
+				// check if a book already exists in user's shelves- if so add the shelf to the search result, otherwise set to none
 				const existingMatch = books.find(existingBook => existingBook.id === searchResultBook.id);
-				if (existingMatch) {
-					searchResultBook.shelf = existingMatch.shelf;
-				}
+					searchResultBook.shelf = existingMatch ? existingMatch.shelf : "none";
 				// return book
 				return searchResultBook;
 			}));
@@ -89,7 +96,11 @@ function App() {
 					<div className="search-books-results">
 						<ol className="books-grid">
 							{
-								searchResults.map(book => <Book bookData={book} key={book.id} updateBook={updateBook} />)
+								searchResults.map(book => {
+									console.log('<ol className="books-grid">:: adding:', book);
+									return <Book bookData={book} key={book.id} updateBook={updateBook} />
+								
+								})
 							}
 						</ol>
 					</div>
