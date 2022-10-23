@@ -12,6 +12,9 @@ Using the provided workspace template, and making it functional:
 * Base template forked from [Udacity's empty MyReads project](https://github.com/udacity/nd0191-c1-myreads).
 * [Project rubric](https://review.udacity.com/#!/rubrics/4971/view) on Udacity's website.
 
+## Credits
+* Special thanks to Dan Rees for clarifying about Udacity's search functionality.
+
 ## Additional resources
 * [No-image file](https://media.istockphoto.com/vectors/no-image-available-icon-vector-id1216251206?k=6&m=1216251206&s=612x612&w=0&h=G8kmMKxZlh7WyeYtlIHJDxP5XRGm9ZXyLprtVJKxd-o=) from [iStock](https://www.istockphoto.com)
 

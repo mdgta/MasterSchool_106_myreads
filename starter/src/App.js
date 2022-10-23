@@ -39,6 +39,14 @@ function App() {
 		});
 	}
 
+	/* clear search page when changing pages */
+	useEffect(() => {
+		if (!showSearchPage) {
+			setSearchTerm("");
+			setSearchResults([]);
+		}
+	}, [showSearchPage, searchTerm]);
+
 	/* load books upon page loading/reload */
 	useEffect(() => {
 		getAll().then(data => {
