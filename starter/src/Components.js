@@ -14,8 +14,7 @@ export function Bookshelf({sourceList, shelfName, shelfTitle, updateBook}) {
 	);
 }
 export function Book({bookData, updateBook}) {
-	console.log("creating book data:", bookData);
-	const {id, title, authors, shelf, imageLinks} = bookData;
+	const {title, authors, shelf, imageLinks} = bookData;
 	const imgUrl = imageLinks?.thumbnail || "http://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73-GnPVEyb7MOCxDzOYF1PTQRuf6nCss9LMNOSWBpxBrz8Pm2_mFtWMMg_Y1dx92HT7cUoQBeSWjs3oEztBVhUeDFQX6-tWlWz1-feexS0mlJPjotcwFqAg6hBYDXuK_bkyHD-y&source=gbs_api";
 	return (
 		<li>
@@ -31,7 +30,6 @@ export function Book({bookData, updateBook}) {
 						}}
 					></div>
 					<div className="book-shelf-changer">
-						{console.log("Book rendering: setting select value's shelf to:", shelf)}
 						<select value={shelf} onChange={(e) => {
 								updateBook(bookData, e.target.value);
 							}}>
@@ -44,7 +42,13 @@ export function Book({bookData, updateBook}) {
 					</div>
 				</div>
 				<div className="book-title">{title}</div>
-				<div className="book-authors">{authors?.[0] || "<Unknown Author>"}</div>
+				<div className="book-authors">
+					{
+						(authors || []).map((author, i, list) => {
+							return author + (i + 1 < list.length ? (i + 2 === list.length ? " and" : ",") : "")
+						}).join(" ") || "<Unknown Author>"
+					}
+				</div>
 			</div>
 		</li>
 	);

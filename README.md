@@ -1,3 +1,17 @@
+# Installation
+
+After forking and cloning the repo, `cd starter/` to go to the `starter` directory, and run the following command:
+
+```bash
+npm install
+```
+
+And to run the app:
+
+```bash
+npm start
+```
+
 # Overview
 Udacity's React final project, "MyReads".
 

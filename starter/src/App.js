@@ -11,22 +11,16 @@ function App() {
 
 	/* functionality */
 	function updateBook(book, shelf) {
-		console.log(`moving [${book.title}] to [${book.shelf}]: START`, book);
 		update(book, shelf).then(data => {
-			console.log(`moving [${book.title}] to [${book.shelf}]: DONE`, book);
-			console.log("update data was:", data);
 			const newBooksState = [...books];
 			const existingBookIndex = newBooksState.findIndex(bookInOldList => bookInOldList.id === book.id);
-			console.log({newBooksState: newBooksState.concat(), existingBookIndex});
 			if (existingBookIndex > -1) {
 				// remove if old state
 				newBooksState.splice(existingBookIndex, 1);
 			}
 			if (!(shelf === "none")) {
-				console.log("shelf was NOT none, so adding book to spliced list");
 				newBooksState.push({...book, shelf});
 			}
-			console.log({newBooksState: newBooksState.concat(), existingBookIndex});
 			setBooks(newBooksState);
 			// update search results if necessary
 			setSearchResults(searchResults.map(result => {
@@ -50,14 +44,12 @@ function App() {
 	/* load books upon page loading/reload */
 	useEffect(() => {
 		getAll().then(data => {
-			console.log(data);
 			setBooks(data);
 		});
 	}, []);
 
 	/* search functionality */
 	useEffect(() => {
-		console.log("searching for: " + searchTerm);
 		// ignore upon page loading or when blanking the search bar
 		if (searchTerm === "") {
 			setSearchTerm("");
@@ -65,7 +57,6 @@ function App() {
 			return;
 		}
 		search(searchTerm).then(results => {
-			console.log("search results:", results);
 			if (!(results instanceof Array)) {
 				// no results (regular object returned)- empty previous results
 				setSearchResults([]);
@@ -105,7 +96,6 @@ function App() {
 						<ol className="books-grid">
 							{
 								searchResults.map(book => {
-									console.log('<ol className="books-grid">:: adding:', book);
 									return <Book bookData={book} key={book.id} updateBook={updateBook} />
 								
 								})
